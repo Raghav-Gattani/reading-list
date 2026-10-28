@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Straw Hat Reading List</title>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;min-height:100vh;font-family:Nunito,sans-serif;background:linear-gradient(#0a1a33,#12305a);color:#fff;padding:20px}
+.w{max-width:640px;margin:auto}h1{font-family:'Pirata One';color:#f7c948;text-align:center;font-size:2.4rem;text-shadow:2px 2px #e63946}
+form{display:flex;gap:8px;flex-wrap:wrap}input{padding:10px;border-radius:8px;border:3px solid #f7c948;font:inherit;flex:1;min-width:130px}
+button{background:#e63946;color:#fff;border:2px solid #f7c948;border-radius:8px;padding:10px 16px;font:700 1rem Nunito;cursor:pointer}
+.f{margin:14px 0;display:flex;gap:6px;flex-wrap:wrap}.f button{background:transparent;padding:5px 14px}.f .on{background:#f7c948;color:#222}
+.b{background:#fff6e0;color:#3b2a14;border:4px double #3b2a14;border-radius:8px;padding:12px;margin:10px 0;display:flex;align-items:center;gap:10px}
+.b div{flex:1}.b.done b{text-decoration:line-through;opacity:.6}.b small{display:block}
+.b button{padding:5px 10px;font-size:.85rem}#c{text-align:center;opacity:.9}
+</style></head><body><div class="w">
+<h1>📚 Straw Hat Reading List</h1>
+<form id="f"><input id="t" placeholder="Book title" required><input id="a" placeholder="Author"><button>Add book</button></form>
+<div class="f" id="fl"></div><div id="list"></div><p id="c"></p></div>
+<script>
+let books=[],filter="all";
+try{books=JSON.parse(localStorage.getItem("books"))||[]}catch(e){}
+const $=id=>document.getElementById(id),save=()=>{try{localStorage.setItem("books",JSON.stringify(books))}catch(e){}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function render(){
+ $("fl").innerHTML=["all","to read","read"].map(x=>`<button class="${x===filter?"on":""}" data-x="${x}">${x}</button>`).join("");
+ document.querySelectorAll(".f button").forEach(b=>b.onclick=()=>{filter=b.dataset.x;render()});
+ const v=books.map((b,i)=>({...b,i})).filter(b=>filter==="all"||(filter==="read")===b.done);
+ $("list").innerHTML=v.length?v.map(b=>`<div class="b ${b.done?"done":""}"><div><b>${esc(b.t)}</b><small>${esc(b.a||"Unknown author")}</small></div><button data-d="${b.i}">${b.done?"↩ Unread":"✅ Read"}</button><button data-r="${b.i}">🗑</button></div>`).join(""):"<p style='text-align:center'>No books on this island yet.</p>";
+ document.querySelectorAll("[data-d]").forEach(x=>x.onclick=()=>{books[x.dataset.d].done=!books[x.dataset.d].done;save();render()});
+ document.querySelectorAll("[data-r]").forEach(x=>x.onclick=()=>{books.splice(x.dataset.r,1);save();render()});
+ $("c").textContent=`${books.filter(b=>b.done).length} of ${books.length} books read`;
+}
+$("f").onsubmit=e=>{e.preventDefault();books.push({t:$("t").value.trim(),a:$("a").value.trim(),done:false});save();$("f").reset();render()};
+render();
+</script></body></html>
