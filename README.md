@@ -2,7 +2,7 @@
 
 A reading list app with a One Piece theme, built with HTML, CSS and JavaScript.
 
-**🌐 Live app:** https://quiz-app-gc4c.vercel.app/
+**🌐 Live app:** https://reading-list-gc4c.vercel.app/
 
 ## How it works
 1. Type a title (and author) and click **Add book**.
